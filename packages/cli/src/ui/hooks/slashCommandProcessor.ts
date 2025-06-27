@@ -33,6 +33,8 @@ import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
 import { formatDuration, formatMemoryUsage } from '../utils/formatters.js';
 import { getCliVersion } from '../../utils/version.js';
 import { LoadedSettings } from '../../config/settings.js';
+import { setLocale } from '../../i18n.js';
+import { useI18n } from './useI18n.js';
 
 export interface SlashCommandActionReturn {
   shouldScheduleTool?: boolean;
@@ -77,6 +79,7 @@ export const useSlashCommandProcessor = (
   showToolDescriptions: boolean = false,
   setQuittingMessages: (message: HistoryItem[]) => void,
 ) => {
+  const { t, locale } = useI18n();
   const session = useSessionStats();
   const gitService = useMemo(() => {
     if (!config?.getProjectRoot()) {
@@ -191,9 +194,29 @@ export const useSlashCommandProcessor = (
   const slashCommands: SlashCommand[] = useMemo(() => {
     const commands: SlashCommand[] = [
       {
+        name: 'locale',
+        description: t('command.locale.description'),
+        action: (_mainCommand, _subCommand, args) => {
+          if (!args) {
+            addMessage({
+              type: MessageType.ERROR,
+              content: t('command.locale.usage'),
+              timestamp: new Date(),
+            });
+            return;
+          }
+          setLocale(args);
+          addMessage({
+            type: MessageType.INFO,
+            content: t('command.locale.languageSet', args),
+            timestamp: new Date(),
+          });
+        },
+      },
+      {
         name: 'help',
         altName: '?',
-        description: 'for help on gemini-cli',
+        description: t('command.help.description'),
         action: (_mainCommand, _subCommand, _args) => {
           onDebugMessage('Opening help.');
           setShowHelp(true);
@@ -201,7 +224,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'docs',
-        description: 'open full Gemini CLI documentation in your browser',
+        description: t('command.docs.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           const docsUrl = 'https://goo.gle/gemini-cli-docs';
           if (process.env.SANDBOX && process.env.SANDBOX !== 'sandbox-exec') {
@@ -222,7 +245,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'clear',
-        description: 'clear the screen and conversation history',
+        description: t('command.clear.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           onDebugMessage('Clearing terminal and resetting chat.');
           clearItems();
@@ -233,21 +256,21 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'theme',
-        description: 'change the theme',
+        description: t('command.theme.description'),
         action: (_mainCommand, _subCommand, _args) => {
           openThemeDialog();
         },
       },
       {
         name: 'auth',
-        description: 'change the auth method',
+        description: t('command.auth.description'),
         action: (_mainCommand, _subCommand, _args) => {
           openAuthDialog();
         },
       },
       {
         name: 'editor',
-        description: 'set external editor preference',
+        description: t('command.editor.description'),
         action: (_mainCommand, _subCommand, _args) => {
           openEditorDialog();
         },
@@ -255,7 +278,7 @@ export const useSlashCommandProcessor = (
       {
         name: 'stats',
         altName: 'usage',
-        description: 'check session stats',
+        description: t('command.stats.description'),
         action: (_mainCommand, _subCommand, _args) => {
           const now = new Date();
           const { sessionStartTime, cumulative, currentTurn } = session.stats;
@@ -272,7 +295,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'mcp',
-        description: 'list configured MCP servers and tools',
+        description: t('command.mcp.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           // Check if the _subCommand includes a specific flag to control description visibility
           let useShowDescriptions = showToolDescriptions;
@@ -471,8 +494,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'memory',
-        description:
-          'manage memory. Usage: /memory <show|refresh|add> [text for add]',
+        description: t('command.memory.description'),
         action: (mainCommand, subCommand, args) => {
           switch (subCommand) {
             case 'show':
@@ -503,7 +525,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'tools',
-        description: 'list available Gemini CLI tools',
+        description: t('command.tools.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           // Check if the _subCommand includes a specific flag to control description visibility
           let useShowDescriptions = showToolDescriptions;
@@ -577,13 +599,14 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'corgi',
+        description: t('command.corgi.description'),
         action: (_mainCommand, _subCommand, _args) => {
           toggleCorgiMode();
         },
       },
       {
         name: 'about',
-        description: 'show version info',
+        description: t('command.about.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           const osVersion = process.platform;
           let sandboxEnv = 'no sandbox';
@@ -608,7 +631,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'bug',
-        description: 'submit a bug report',
+        description: t('command.bug.description'),
         action: async (_mainCommand, _subCommand, args) => {
           let bugDescription = _subCommand || '';
           if (args) {
@@ -670,8 +693,7 @@ export const useSlashCommandProcessor = (
       },
       {
         name: 'chat',
-        description:
-          'Manage conversation history. Usage: /chat <list|save|resume> [tag]',
+        description: t('command.chat.description'),
         action: async (_mainCommand, subCommand, args) => {
           const tag = (args || '').trim();
           const logger = new Logger(config?.getSessionId() || '');
@@ -791,7 +813,7 @@ export const useSlashCommandProcessor = (
       {
         name: 'quit',
         altName: 'exit',
-        description: 'exit the cli',
+        description: t('command.quit.description'),
         action: async (mainCommand, _subCommand, _args) => {
           const now = new Date();
           const { sessionStartTime, cumulative } = session.stats;
@@ -819,7 +841,7 @@ export const useSlashCommandProcessor = (
       {
         name: 'compress',
         altName: 'summarize',
-        description: 'Compresses the context by replacing it with a summary.',
+        description: t('command.compress.description'),
         action: async (_mainCommand, _subCommand, _args) => {
           if (pendingCompressionItemRef.current !== null) {
             addMessage({
@@ -874,8 +896,7 @@ export const useSlashCommandProcessor = (
     if (config?.getCheckpointingEnabled()) {
       commands.push({
         name: 'restore',
-        description:
-          'restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested',
+        description: t('command.restore.description'),
         completion: async () => {
           const checkpointDir = config?.getProjectTempDir()
             ? path.join(config.getProjectTempDir(), 'checkpoints')
@@ -1015,6 +1036,9 @@ export const useSlashCommandProcessor = (
     setQuittingMessages,
     pendingCompressionItemRef,
     setPendingCompressionItem,
+    settings,
+    t,
+    locale,
   ]);
 
   const handleSlashCommand = useCallback(

@@ -185,7 +185,7 @@ export const useGeminiStream = (
       addItem(
         {
           type: MessageType.INFO,
-          text: 'Request cancelled.',
+          text: t('geminiStream.requestCancelled'),
         },
         Date.now(),
       );

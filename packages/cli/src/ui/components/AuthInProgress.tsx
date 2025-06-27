@@ -48,7 +48,7 @@ export function AuthInProgress({
       ) : (
         <Box>
           <Text>
-            <Spinner type="dots" /> Waiting for auth... (Press ESC to cancel)
+            <Spinner type="dots" /> {t('authInProgress.waitingForAuth')}
           </Text>
         </Box>
       )}
