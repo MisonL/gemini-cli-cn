@@ -5,7 +5,7 @@
  */
 
 import { render } from 'ink-testing-library';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   StatRow,
   StatsColumn,
@@ -13,6 +13,35 @@ import {
   FormattedStats,
 } from './Stats.js';
 import { Colors } from '../colors.js';
+
+vi.mock('../hooks/useI18n.js', () => ({
+  useI18n: () => ({
+    t: vi.fn((key) => {
+      switch (key) {
+        case 'stats.inputTokens':
+          return 'Input Tokens';
+        case 'stats.outputTokens':
+          return 'Output Tokens';
+        case 'stats.toolUseTokens':
+          return 'Tool Use Tokens';
+        case 'stats.thoughtsTokens':
+          return 'Thoughts Tokens';
+        case 'stats.cachedTokens':
+          return 'Cached Tokens';
+        case 'stats.totalTokens':
+          return 'Total Tokens';
+        case 'stats.duration':
+          return 'Duration';
+        case 'stats.apiTime':
+          return 'API Time';
+        case 'stats.wallTime':
+          return 'Wall Time';
+        default:
+          return key;
+      }
+    }),
+  }),
+}));
 
 describe('<StatRow />', () => {
   it('renders a label and value', () => {

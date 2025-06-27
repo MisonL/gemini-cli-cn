@@ -11,6 +11,7 @@ import { Colors } from '../colors.js';
 import { useStreamingContext } from '../contexts/StreamingContext.js';
 import { StreamingState } from '../types.js';
 import { GeminiRespondingSpinner } from './GeminiRespondingSpinner.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface LoadingIndicatorProps {
   currentLoadingPhrase?: string;
@@ -25,6 +26,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   rightContent,
   thought,
 }) => {
+  const { t } = useI18n();
   const streamingState = useStreamingContext();
 
   if (streamingState === StreamingState.Idle) {

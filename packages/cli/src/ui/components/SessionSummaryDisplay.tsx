@@ -11,6 +11,7 @@ import { Colors } from '../colors.js';
 import { formatDuration } from '../utils/formatters.js';
 import { CumulativeStats } from '../contexts/SessionContext.js';
 import { FormattedStats, StatRow, StatsColumn } from './Stats.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 // --- Prop and Data Structures ---
 
@@ -25,6 +26,7 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
   stats,
   duration,
 }) => {
+  const { t } = useI18n();
   const cumulativeFormatted: FormattedStats = {
     inputTokens: stats.promptTokenCount,
     outputTokens: stats.candidatesTokenCount,
@@ -34,7 +36,7 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
     totalTokens: stats.totalTokenCount,
   };
 
-  const title = 'Agent powering down. Goodbye!';
+  const title = t('quit.agentPoweringDown');
 
   return (
     <Box
@@ -57,16 +59,16 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
 
       <Box marginTop={1}>
         <StatsColumn
-          title={`Cumulative Stats (${stats.turnCount} Turns)`}
+          title={t('quit.cumulativeStats', stats.turnCount)}
           stats={cumulativeFormatted}
           isCumulative={true}
         >
           <Box marginTop={1} flexDirection="column">
             <StatRow
-              label="Total duration (API)"
+              label={t('quit.totalDurationApi')}
               value={formatDuration(stats.apiTimeMs)}
             />
-            <StatRow label="Total duration (wall)" value={duration} />
+            <StatRow label={t('quit.totalDurationWall')} value={duration} />
           </Box>
         </StatsColumn>
       </Box>

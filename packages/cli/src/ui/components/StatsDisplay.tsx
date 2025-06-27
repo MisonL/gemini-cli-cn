@@ -10,6 +10,7 @@ import { Colors } from '../colors.js';
 import { formatDuration } from '../utils/formatters.js';
 import { CumulativeStats } from '../contexts/SessionContext.js';
 import { FormattedStats, StatRow, StatsColumn } from './Stats.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 // --- Constants ---
 
@@ -30,6 +31,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   lastTurnStats,
   duration,
 }) => {
+  const { t } = useI18n();
   const lastTurnFormatted: FormattedStats = {
     inputTokens: lastTurnStats.promptTokenCount,
     outputTokens: lastTurnStats.candidatesTokenCount,
@@ -57,17 +59,22 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
       paddingX={2}
     >
       <Text bold color={Colors.AccentPurple}>
-        Stats
+        {t('stats.title')}
       </Text>
 
       <Box flexDirection="row" justifyContent="space-between" marginTop={1}>
         <StatsColumn
-          title="Last Turn"
+          title={t('stats.lastTurn')}
           stats={lastTurnFormatted}
           width={COLUMN_WIDTH}
         />
         <StatsColumn
-          title={`Cumulative (${stats.turnCount} Turns)`}
+          title={t(
+            'stats.cumulative',
+            stats.turnCount > 0
+              ? t('stats.turns', stats.turnCount)
+              : t('stats.turns', 0),
+          )}
           stats={cumulativeFormatted}
           isCumulative={true}
           width={COLUMN_WIDTH}
@@ -78,7 +85,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         {/* Left column for "Last Turn" duration */}
         <Box width={COLUMN_WIDTH} flexDirection="column">
           <StatRow
-            label="Turn Duration (API)"
+            label={t('stats.turnDurationApi')}
             value={formatDuration(lastTurnStats.apiTimeMs)}
           />
         </Box>
@@ -86,10 +93,10 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         {/* Right column for "Cumulative" durations */}
         <Box width={COLUMN_WIDTH} flexDirection="column">
           <StatRow
-            label="Total duration (API)"
+            label={t('stats.totalDurationApi')}
             value={formatDuration(stats.apiTimeMs)}
           />
-          <StatRow label="Total duration (wall)" value={duration} />
+          <StatRow label={t('stats.totalDurationWall')} value={duration} />
         </Box>
       </Box>
     </Box>

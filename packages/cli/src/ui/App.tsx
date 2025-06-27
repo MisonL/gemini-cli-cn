@@ -70,6 +70,7 @@ import { checkForUpdates } from './utils/updateCheck.js';
 import ansiEscapes from 'ansi-escapes';
 import { OverflowProvider } from './contexts/OverflowContext.js';
 import { ShowMoreLines } from './components/ShowMoreLines.js';
+import { useI18n } from './hooks/useI18n.js';
 
 const CTRL_EXIT_PROMPT_DURATION_MS = 1000;
 
@@ -86,6 +87,7 @@ export const AppWrapper = (props: AppProps) => (
 );
 
 const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
+  const { t } = useI18n();
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const { stdout } = useStdout();
 
@@ -175,7 +177,7 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
     addItem(
       {
         type: MessageType.INFO,
-        text: 'Refreshing hierarchical memory (GEMINI.md or other context files)...',
+        text: t('memory.refreshing'),
       },
       Date.now(),
     );
@@ -193,7 +195,13 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
       addItem(
         {
           type: MessageType.INFO,
-          text: `Memory refreshed successfully. ${memoryContent.length > 0 ? `Loaded ${memoryContent.length} characters from ${fileCount} file(s).` : 'No memory content found.'}`,
+          text:
+            memoryContent.length > 0
+              ? t(
+                  'memory.refreshedSuccess',
+                  t('memory.loadedCharacters', memoryContent.length, fileCount),
+                )
+              : t('memory.noContentFound'),
         },
         Date.now(),
       );
@@ -207,13 +215,13 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
       addItem(
         {
           type: MessageType.ERROR,
-          text: `Error refreshing memory: ${errorMessage}`,
+          text: t('memory.errorRefreshing', errorMessage),
         },
         Date.now(),
       );
       console.error('Error refreshing memory:', error);
     }
-  }, [config, addItem]);
+  }, [config, addItem, t]);
 
   // Watch for model changes (e.g., from Flash fallback)
   useEffect(() => {
@@ -241,9 +249,7 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
       addItem(
         {
           type: MessageType.INFO,
-          text: `⚡ Slow response times detected. Automatically switching from ${currentModel} to ${fallbackModel} for faster responses for the remainder of this session.
-⚡ To avoid this you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
-⚡ You can switch authentication methods by typing /auth`,
+          text: t('flashFallback.message', currentModel, fallbackModel),
         },
         Date.now(),
       );
@@ -251,7 +257,7 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
     };
 
     config.setFlashFallbackHandler(flashFallbackHandler);
-  }, [config, addItem]);
+  }, [config, addItem, t]);
 
   const {
     handleSlashCommand,
@@ -737,11 +743,11 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
                   )}
                   {ctrlCPressedOnce ? (
                     <Text color={Colors.AccentYellow}>
-                      Press Ctrl+C again to exit.
+                      {t('exit.pressCtrlCAgain')}
                     </Text>
                   ) : ctrlDPressedOnce ? (
                     <Text color={Colors.AccentYellow}>
-                      Press Ctrl+D again to exit.
+                      {t('exit.pressCtrlDAgain')}
                     </Text>
                   ) : (
                     <ContextSummaryDisplay
@@ -815,11 +821,11 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
               ) : (
                 <>
                   <Text color={Colors.AccentRed}>
-                    Initialization Error: {initError}
+                    {t('error.initializationError', initError)}
                   </Text>
                   <Text color={Colors.AccentRed}>
                     {' '}
-                    Please check API key and configuration.
+                    {t('error.checkApiKeyConfig')}
                   </Text>
                 </>
               )}

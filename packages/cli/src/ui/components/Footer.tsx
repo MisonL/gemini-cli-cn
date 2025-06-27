@@ -11,6 +11,7 @@ import { shortenPath, tildeifyPath, tokenLimit } from '@google/gemini-cli-core';
 import { ConsoleSummaryDisplay } from './ConsoleSummaryDisplay.js';
 import process from 'node:process';
 import { MemoryUsageDisplay } from './MemoryUsageDisplay.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface FooterProps {
   model: string;
@@ -39,6 +40,7 @@ export const Footer: React.FC<FooterProps> = ({
   showMemoryUsage,
   totalTokenCount,
 }) => {
+  const { t } = useI18n();
   const limit = tokenLimit(model);
   const percentage = totalTokenCount / limit;
 
@@ -51,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({
         </Text>
         {debugMode && (
           <Text color={Colors.AccentRed}>
-            {' ' + (debugMessage || '--debug')}
+            {' ' + (debugMessage || t('footer.debugMode'))}
           </Text>
         )}
       </Box>
@@ -69,12 +71,15 @@ export const Footer: React.FC<FooterProps> = ({
           </Text>
         ) : process.env.SANDBOX === 'sandbox-exec' ? (
           <Text color={Colors.AccentYellow}>
-            MacOS Seatbelt{' '}
-            <Text color={Colors.Gray}>({process.env.SEATBELT_PROFILE})</Text>
+            {t('footer.macOSSeatbelt')}{' '}
+            <Text color={Colors.Gray}>
+              {t('footer.macOSSeatbeltProfile', process.env.SEATBELT_PROFILE)}
+            </Text>
           </Text>
         ) : (
           <Text color={Colors.AccentRed}>
-            no sandbox <Text color={Colors.Gray}>(see /docs)</Text>
+            {t('footer.noSandbox')}{' '}
+            <Text color={Colors.Gray}>{t('footer.seeDocs')}</Text>
           </Text>
         )}
       </Box>
@@ -85,22 +90,24 @@ export const Footer: React.FC<FooterProps> = ({
           {' '}
           {model}{' '}
           <Text color={Colors.Gray}>
-            ({((1 - percentage) * 100).toFixed(0)}% context left)
+            {t('footer.contextLeft', ((1 - percentage) * 100).toFixed(0))}
           </Text>
         </Text>
         {corgiMode && (
           <Text>
-            <Text color={Colors.Gray}>| </Text>
-            <Text color={Colors.AccentRed}>▼</Text>
-            <Text color={Colors.Foreground}>(´</Text>
-            <Text color={Colors.AccentRed}>ᴥ</Text>
-            <Text color={Colors.Foreground}>`)</Text>
-            <Text color={Colors.AccentRed}>▼ </Text>
+            <Text color={Colors.Gray}>{t('footer.corgiSeparator')}</Text>
+            <Text color={Colors.AccentRed}>{t('footer.corgiFacePart4')}</Text>
+            <Text color={Colors.Foreground}>{t('footer.corgiFacePart1')}</Text>
+            <Text color={Colors.AccentRed}>{t('footer.corgiFacePart2')}</Text>
+            <Text color={Colors.Foreground}>{t('footer.corgiFacePart3')}</Text>
+            <Text color={Colors.AccentRed}>{t('footer.corgiFacePart4')}</Text>
           </Text>
         )}
         {!showErrorDetails && errorCount > 0 && (
           <Box>
-            <Text color={Colors.Gray}>| </Text>
+            <Text color={Colors.Gray}>
+              {t('footer.consoleSummarySeparator')}
+            </Text>
             <ConsoleSummaryDisplay errorCount={errorCount} />
           </Box>
         )}

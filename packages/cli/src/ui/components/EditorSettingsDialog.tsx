@@ -15,6 +15,7 @@ import {
 import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js';
 import { EditorType, isEditorAvailable } from '@google/gemini-cli-core';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface EditorDialogProps {
   onSelect: (editorType: EditorType | undefined, scope: SettingScope) => void;
@@ -27,6 +28,7 @@ export function EditorSettingsDialog({
   settings,
   onExit,
 }: EditorDialogProps): React.JSX.Element {
+  const { t } = useI18n();
   const [selectedScope, setSelectedScope] = useState<SettingScope>(
     SettingScope.User,
   );
@@ -53,13 +55,16 @@ export function EditorSettingsDialog({
       )
     : 0;
   if (editorIndex === -1) {
-    console.error(`Editor is not supported: ${currentPreference}`);
+    console.error(t('editorDialog.editorNotSupported', currentPreference));
     editorIndex = 0;
   }
 
   const scopeItems = [
-    { label: 'User Settings', value: SettingScope.User },
-    { label: 'Workspace Settings', value: SettingScope.Workspace },
+    { label: t('editorDialog.userSettings'), value: SettingScope.User },
+    {
+      label: t('editorDialog.workspaceSettings'),
+      value: SettingScope.Workspace,
+    },
   ];
 
   const handleEditorSelect = (editorType: EditorType | 'not_set') => {
@@ -83,11 +88,11 @@ export function EditorSettingsDialog({
   if (settings.forScope(otherScope).settings.preferredEditor !== undefined) {
     otherScopeModifiedMessage =
       settings.forScope(selectedScope).settings.preferredEditor !== undefined
-        ? `(Also modified in ${otherScope})`
-        : `(Modified in ${otherScope})`;
+        ? t('editorDialog.alsoModifiedIn', otherScope)
+        : t('editorDialog.modifiedIn', otherScope);
   }
 
-  let mergedEditorName = 'None';
+  let mergedEditorName = t('editorDialog.none');
   if (
     settings.merged.preferredEditor &&
     isEditorAvailable(settings.merged.preferredEditor)
@@ -106,7 +111,8 @@ export function EditorSettingsDialog({
     >
       <Box flexDirection="column" width="45%" paddingRight={2}>
         <Text bold={focusedSection === 'editor'}>
-          {focusedSection === 'editor' ? '> ' : '  '}Select Editor{' '}
+          {focusedSection === 'editor' ? '> ' : '  '}
+          {t('editorDialog.selectEditor')}{' '}
           <Text color={Colors.Gray}>{otherScopeModifiedMessage}</Text>
         </Text>
         <RadioButtonSelect
@@ -123,7 +129,8 @@ export function EditorSettingsDialog({
 
         <Box marginTop={1} flexDirection="column">
           <Text bold={focusedSection === 'scope'}>
-            {focusedSection === 'scope' ? '> ' : '  '}Apply To
+            {focusedSection === 'scope' ? '> ' : '  '}
+            {t('editorDialog.applyTo')}
           </Text>
           <RadioButtonSelect
             items={scopeItems}
@@ -135,23 +142,22 @@ export function EditorSettingsDialog({
 
         <Box marginTop={1}>
           <Text color={Colors.Gray}>
-            (Use Enter to select, Tab to change focus)
+            {t('editorDialog.useEnterToSelectTabToChangeFocus')}
           </Text>
         </Box>
       </Box>
 
       <Box flexDirection="column" width="55%" paddingLeft={2}>
-        <Text bold>Editor Preference</Text>
+        <Text bold>{t('editorDialog.editorPreference')}</Text>
         <Box flexDirection="column" gap={1} marginTop={1}>
           <Text color={Colors.Gray}>
-            These editors are currently supported. Please note that some editors
-            cannot be used in sandbox mode.
+            {t('editorDialog.supportedEditorsNote')}
           </Text>
           <Text color={Colors.Gray}>
-            Your preferred editor is:{' '}
+            {t('editorDialog.preferredEditorIs', '')}
             <Text
               color={
-                mergedEditorName === 'None'
+                mergedEditorName === t('editorDialog.none')
                   ? Colors.AccentRed
                   : Colors.AccentCyan
               }

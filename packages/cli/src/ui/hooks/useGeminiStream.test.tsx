@@ -797,7 +797,7 @@ describe('useGeminiStream', () => {
         expect(mockAddItem).toHaveBeenCalledWith(
           {
             type: MessageType.INFO,
-            text: 'Request cancelled.',
+            text: 'geminiStream.requestCancelled',
           },
           expect.any(Number),
         );

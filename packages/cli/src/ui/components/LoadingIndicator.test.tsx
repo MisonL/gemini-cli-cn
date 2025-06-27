@@ -12,6 +12,17 @@ import { StreamingContext } from '../contexts/StreamingContext.js';
 import { StreamingState } from '../types.js';
 import { vi } from 'vitest';
 
+vi.mock('../hooks/useI18n.js', () => ({
+  useI18n: () => ({
+    t: vi.fn((key, ...args) => {
+      if (key === 'loading.cancelHint') {
+        return `(esc to cancel, ${args[0]}s)`;
+      }
+      return key;
+    }),
+  }),
+}));
+
 // Mock GeminiRespondingSpinner
 vi.mock('./GeminiRespondingSpinner.js', () => ({
   GeminiRespondingSpinner: ({

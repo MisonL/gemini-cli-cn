@@ -8,6 +8,7 @@ import React from 'react';
 import { Box, Text } from 'ink';
 import { Colors } from '../colors.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface AboutBoxProps {
   cliVersion: string;
@@ -21,71 +22,74 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
   osVersion,
   sandboxEnv,
   modelVersion,
-}) => (
-  <Box
-    borderStyle="round"
-    borderColor={Colors.Gray}
-    flexDirection="column"
-    padding={1}
-    marginY={1}
-    width="100%"
-  >
-    <Box marginBottom={1}>
-      <Text bold color={Colors.AccentPurple}>
-        About Gemini CLI
-      </Text>
-    </Box>
-    <Box flexDirection="row">
-      <Box width="35%">
-        <Text bold color={Colors.LightBlue}>
-          CLI Version
+}) => {
+  const { t } = useI18n();
+  return (
+    <Box
+      borderStyle="round"
+      borderColor={Colors.Gray}
+      flexDirection="column"
+      padding={1}
+      marginY={1}
+      width="100%"
+    >
+      <Box marginBottom={1}>
+        <Text bold color={Colors.AccentPurple}>
+          {t('about.title')}
         </Text>
       </Box>
-      <Box>
-        <Text>{cliVersion}</Text>
-      </Box>
-    </Box>
-    {GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO) && (
       <Box flexDirection="row">
         <Box width="35%">
           <Text bold color={Colors.LightBlue}>
-            Git Commit
+            {t('about.cliVersion')}
           </Text>
         </Box>
         <Box>
-          <Text>{GIT_COMMIT_INFO}</Text>
+          <Text>{cliVersion}</Text>
         </Box>
       </Box>
-    )}
-    <Box flexDirection="row">
-      <Box width="35%">
-        <Text bold color={Colors.LightBlue}>
-          Model
-        </Text>
+      {GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO) && (
+        <Box flexDirection="row">
+          <Box width="35%">
+            <Text bold color={Colors.LightBlue}>
+              {t('about.gitCommit')}
+            </Text>
+          </Box>
+          <Box>
+            <Text>{GIT_COMMIT_INFO}</Text>
+          </Box>
+        </Box>
+      )}
+      <Box flexDirection="row">
+        <Box width="35%">
+          <Text bold color={Colors.LightBlue}>
+            {t('about.model')}
+          </Text>
+        </Box>
+        <Box>
+          <Text>{modelVersion}</Text>
+        </Box>
       </Box>
-      <Box>
-        <Text>{modelVersion}</Text>
+      <Box flexDirection="row">
+        <Box width="35%">
+          <Text bold color={Colors.LightBlue}>
+            {t('about.sandbox')}
+          </Text>
+        </Box>
+        <Box>
+          <Text>{sandboxEnv}</Text>
+        </Box>
+      </Box>
+      <Box flexDirection="row">
+        <Box width="35%">
+          <Text bold color={Colors.LightBlue}>
+            {t('about.os')}
+          </Text>
+        </Box>
+        <Box>
+          <Text>{osVersion}</Text>
+        </Box>
       </Box>
     </Box>
-    <Box flexDirection="row">
-      <Box width="35%">
-        <Text bold color={Colors.LightBlue}>
-          Sandbox
-        </Text>
-      </Box>
-      <Box>
-        <Text>{sandboxEnv}</Text>
-      </Box>
-    </Box>
-    <Box flexDirection="row">
-      <Box width="35%">
-        <Text bold color={Colors.LightBlue}>
-          OS
-        </Text>
-      </Box>
-      <Box>
-        <Text>{osVersion}</Text>
-      </Box>
-    </Box>
-  </Box>
-);
+  );
+};

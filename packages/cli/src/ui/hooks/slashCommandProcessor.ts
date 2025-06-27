@@ -79,7 +79,7 @@ export const useSlashCommandProcessor = (
   showToolDescriptions: boolean = false,
   setQuittingMessages: (message: HistoryItem[]) => void,
 ) => {
-  const { t, locale } = useI18n();
+  const { t, locale: _locale } = useI18n();
   const session = useSessionStats();
   const gitService = useMemo(() => {
     if (!config?.getProjectRoot()) {
@@ -196,8 +196,13 @@ export const useSlashCommandProcessor = (
       {
         name: 'locale',
         description: t('command.locale.description'),
-        action: (_mainCommand, _subCommand, args) => {
-          if (!args) {
+        action: (_mainCommand, subCommand, _args) => {
+          // Set locale first so messages are translated
+          if (subCommand) {
+            setLocale(subCommand);
+          }
+
+          if (!subCommand) {
             addMessage({
               type: MessageType.ERROR,
               content: t('command.locale.usage'),
@@ -205,10 +210,9 @@ export const useSlashCommandProcessor = (
             });
             return;
           }
-          setLocale(args);
           addMessage({
             type: MessageType.INFO,
-            content: t('command.locale.languageSet', args),
+            content: t('command.locale.languageSet', subCommand),
             timestamp: new Date(),
           });
         },
@@ -556,7 +560,7 @@ export const useSlashCommandProcessor = (
           // Filter out MCP tools by checking if they have a serverName property
           const geminiTools = tools.filter((tool) => !('serverName' in tool));
 
-          let message = 'Available Gemini CLI tools:\n\n';
+          let message = t('tools.availableTools') + '\n\n';
 
           if (geminiTools.length > 0) {
             geminiTools.forEach((tool) => {
@@ -583,7 +587,7 @@ export const useSlashCommandProcessor = (
               }
             });
           } else {
-            message += '  No tools available\n';
+            message += t('tools.noToolsAvailable');
           }
           message += '\n';
 
@@ -702,7 +706,7 @@ export const useSlashCommandProcessor = (
           if (!chat) {
             addMessage({
               type: MessageType.ERROR,
-              content: 'No chat client available for conversation status.',
+              content: t('chat.noClientAvailable'),
               timestamp: new Date(),
             });
             return;
@@ -710,7 +714,7 @@ export const useSlashCommandProcessor = (
           if (!subCommand) {
             addMessage({
               type: MessageType.ERROR,
-              content: 'Missing command\nUsage: /chat <list|save|resume> [tag]',
+              content: t('command.chat.usage'),
               timestamp: new Date(),
             });
             return;
@@ -722,13 +726,16 @@ export const useSlashCommandProcessor = (
                 await logger.saveCheckpoint(chat?.getHistory() || [], tag);
                 addMessage({
                   type: MessageType.INFO,
-                  content: `Conversation checkpoint saved${tag ? ' with tag: ' + tag : ''}.`,
+                  content: t(
+                    'chat.checkpointSaved',
+                    tag ? ` with tag: ${tag}` : '',
+                  ),
                   timestamp: new Date(),
                 });
               } else {
                 addMessage({
                   type: MessageType.INFO,
-                  content: 'No conversation found to save.',
+                  content: t('chat.noConversationToSave'),
                   timestamp: new Date(),
                 });
               }
@@ -741,7 +748,10 @@ export const useSlashCommandProcessor = (
               if (conversation.length === 0) {
                 addMessage({
                   type: MessageType.INFO,
-                  content: `No saved checkpoint found${tag ? ' with tag: ' + tag : ''}.`,
+                  content: t(
+                    'chat.noCheckpointFound',
+                    tag ? ` with tag: ${tag}` : '',
+                  ),
                   timestamp: new Date(),
                 });
                 return;
@@ -792,16 +802,17 @@ export const useSlashCommandProcessor = (
             case 'list':
               addMessage({
                 type: MessageType.INFO,
-                content:
-                  'list of saved conversations: ' +
+                content: t(
+                  'chat.savedConversationsList',
                   (await savedChatTags()).join(', '),
+                ),
                 timestamp: new Date(),
               });
               return;
             default:
               addMessage({
                 type: MessageType.ERROR,
-                content: `Unknown /chat command: ${subCommand}. Available: list, save, resume`,
+                content: t('chat.unknownCommand', subCommand),
                 timestamp: new Date(),
               });
               return;
@@ -1036,9 +1047,7 @@ export const useSlashCommandProcessor = (
     setQuittingMessages,
     pendingCompressionItemRef,
     setPendingCompressionItem,
-    settings,
     t,
-    locale,
   ]);
 
   const handleSlashCommand = useCallback(

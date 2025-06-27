@@ -12,6 +12,7 @@ import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { DiffRenderer } from './messages/DiffRenderer.js';
 import { colorizeCode } from '../utils/CodeColorizer.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface ThemeDialogProps {
   /** Callback function when a theme is selected */
@@ -32,6 +33,7 @@ export function ThemeDialog({
   availableTerminalHeight,
   terminalWidth,
 }: ThemeDialogProps): React.JSX.Element {
+  const { t } = useI18n();
   const [selectedScope, setSelectedScope] = useState<SettingScope>(
     SettingScope.User,
   );
@@ -55,8 +57,11 @@ export function ThemeDialog({
   );
 
   const scopeItems = [
-    { label: 'User Settings', value: SettingScope.User },
-    { label: 'Workspace Settings', value: SettingScope.Workspace },
+    { label: t('themeDialog.userSettings'), value: SettingScope.User },
+    {
+      label: t('themeDialog.workspaceSettings'),
+      value: SettingScope.Workspace,
+    },
   ];
 
   const handleThemeSelect = (themeName: string) => {
@@ -94,8 +99,8 @@ export function ThemeDialog({
   if (settings.forScope(otherScope).settings.theme !== undefined) {
     otherScopeModifiedMessage =
       settings.forScope(selectedScope).settings.theme !== undefined
-        ? `(Also modified in ${otherScope})`
-        : `(Modified in ${otherScope})`;
+        ? t('editorDialog.alsoModifiedIn', otherScope)
+        : t('editorDialog.modifiedIn', otherScope);
   }
 
   // Constants for calculating preview pane layout.
@@ -180,7 +185,8 @@ export function ThemeDialog({
         {/* Left Column: Selection */}
         <Box flexDirection="column" width="45%" paddingRight={2}>
           <Text bold={currenFocusedSection === 'theme'} wrap="truncate">
-            {currenFocusedSection === 'theme' ? '> ' : '  '}Select Theme{' '}
+            {currenFocusedSection === 'theme' ? '> ' : '  '}
+            {t('themeDialog.selectTheme')}{' '}
             <Text color={Colors.Gray}>{otherScopeModifiedMessage}</Text>
           </Text>
           <RadioButtonSelect
@@ -196,7 +202,8 @@ export function ThemeDialog({
           {showScopeSelection && (
             <Box marginTop={1} flexDirection="column">
               <Text bold={currenFocusedSection === 'scope'} wrap="truncate">
-                {currenFocusedSection === 'scope' ? '> ' : '  '}Apply To
+                {currenFocusedSection === 'scope' ? '> ' : '  '}
+                {t('themeDialog.applyTo')}
               </Text>
               <RadioButtonSelect
                 items={scopeItems}
@@ -211,7 +218,7 @@ export function ThemeDialog({
 
         {/* Right Column: Preview */}
         <Box flexDirection="column" width="55%" paddingLeft={2}>
-          <Text bold>Preview</Text>
+          <Text bold>{t('themeDialog.preview')}</Text>
           <Box
             borderStyle="single"
             borderColor={Colors.Gray}
@@ -249,8 +256,10 @@ export function ThemeDialog({
       </Box>
       <Box marginTop={1}>
         <Text color={Colors.Gray} wrap="truncate">
-          (Use Enter to select
-          {showScopeSelection ? ', Tab to change focus' : ''})
+          {t(
+            'themeDialog.useEnterToSelect',
+            showScopeSelection ? t('themeDialog.tabToChangeFocus') : '',
+          )}
         </Text>
       </Box>
     </Box>

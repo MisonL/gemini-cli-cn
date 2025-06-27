@@ -5,9 +5,46 @@
  */
 
 import { render } from 'ink-testing-library';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { StatsDisplay } from './StatsDisplay.js';
 import { type CumulativeStats } from '../contexts/SessionContext.js';
+
+vi.mock('../hooks/useI18n.js', () => ({
+  useI18n: () => ({
+    t: vi.fn((key, ...args) => {
+      switch (key) {
+        case 'stats.title':
+          return 'Stats';
+        case 'stats.lastTurn':
+          return 'Last Turn';
+        case 'stats.cumulative':
+          return `Cumulative (${args[0]})`;
+        case 'stats.turns':
+          return `${args[0]} Turns`;
+        case 'stats.inputTokens':
+          return 'Input Tokens';
+        case 'stats.outputTokens':
+          return 'Output Tokens';
+        case 'stats.toolUseTokens':
+          return 'Tool Use Tokens';
+        case 'stats.thoughtsTokens':
+          return 'Thoughts Tokens';
+        case 'stats.cachedTokens':
+          return 'Cached Tokens';
+        case 'stats.totalTokens':
+          return 'Total Tokens';
+        case 'stats.turnDurationApi':
+          return 'Turn Duration (API)';
+        case 'stats.totalDurationApi':
+          return 'Total duration (API)';
+        case 'stats.totalDurationWall':
+          return 'Total duration (wall)';
+        default:
+          return key;
+      }
+    }),
+  }),
+}));
 
 describe('<StatsDisplay />', () => {
   const mockStats: CumulativeStats = {

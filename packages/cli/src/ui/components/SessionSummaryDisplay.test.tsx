@@ -5,7 +5,38 @@
  */
 
 import { render } from 'ink-testing-library';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('../hooks/useI18n.js', () => ({
+  useI18n: () => ({
+    t: vi.fn((key, ...args) => {
+      switch (key) {
+        case 'quit.agentPoweringDown':
+          return 'Agent powering down. Goodbye!';
+        case 'quit.cumulativeStats':
+          return `Cumulative Stats (${args[0]} Turns)`;
+        case 'stats.inputTokens':
+          return 'Input Tokens';
+        case 'stats.outputTokens':
+          return 'Output Tokens';
+        case 'stats.toolUseTokens':
+          return 'Tool Use Tokens';
+        case 'stats.thoughtsTokens':
+          return 'Thoughts Tokens';
+        case 'stats.cachedTokens':
+          return 'Cached Tokens';
+        case 'stats.totalTokens':
+          return 'Total Tokens';
+        case 'quit.totalDurationApi':
+          return 'Total duration (API)';
+        case 'quit.totalDurationWall':
+          return 'Total duration (wall)';
+        default:
+          return key;
+      }
+    }),
+  }),
+}));
 import { SessionSummaryDisplay } from './SessionSummaryDisplay.js';
 import { type CumulativeStats } from '../contexts/SessionContext.js';
 

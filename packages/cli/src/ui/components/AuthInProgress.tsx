@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
 import Spinner from 'ink-spinner';
 import { Colors } from '../colors.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface AuthInProgressProps {
   onTimeout: () => void;
@@ -16,6 +17,7 @@ interface AuthInProgressProps {
 export function AuthInProgress({
   onTimeout,
 }: AuthInProgressProps): React.JSX.Element {
+  const { t } = useI18n();
   const [timedOut, setTimedOut] = useState(false);
 
   useInput((_, key) => {

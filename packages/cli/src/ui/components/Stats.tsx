@@ -7,6 +7,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import { Colors } from '../colors.js';
+import { useI18n } from '../hooks/useI18n.js';
 
 // --- Prop and Data Structures ---
 
@@ -45,6 +46,7 @@ export const StatsColumn: React.FC<{
   width?: string | number;
   children?: React.ReactNode;
 }> = ({ title, stats, isCumulative = false, width, children }) => {
+  const { t } = useI18n();
   const cachedDisplay =
     isCumulative && stats.totalTokens > 0
       ? `${stats.cachedTokens.toLocaleString()} (${((stats.cachedTokens / stats.totalTokens) * 100).toFixed(1)}%)`
@@ -59,26 +61,28 @@ export const StatsColumn: React.FC<{
       <Box marginTop={1} flexDirection="column">
         {/* All StatRows below will now inherit the gap */}
         <StatRow
-          label="Input Tokens"
+          label={t('stats.inputTokens')}
           value={stats.inputTokens.toLocaleString()}
         />
         <StatRow
-          label="Output Tokens"
+          label={t('stats.outputTokens')}
           value={stats.outputTokens.toLocaleString()}
         />
         {stats.toolUseTokens > 0 && (
           <StatRow
-            label="Tool Use Tokens"
+            label={t('stats.toolUseTokens')}
             value={stats.toolUseTokens.toLocaleString()}
           />
         )}
-        <StatRow
-          label="Thoughts Tokens"
-          value={stats.thoughtsTokens.toLocaleString()}
-        />
+        {stats.thoughtsTokens > 0 && (
+          <StatRow
+            label={t('stats.thoughtsTokens')}
+            value={stats.thoughtsTokens.toLocaleString()}
+          />
+        )}
         {stats.cachedTokens > 0 && (
           <StatRow
-            label="Cached Tokens"
+            label={t('stats.cachedTokens')}
             value={cachedDisplay}
             valueColor={cachedColor}
           />
@@ -92,7 +96,7 @@ export const StatsColumn: React.FC<{
           borderStyle="single"
         />
         <StatRow
-          label="Total Tokens"
+          label={t('stats.totalTokens')}
           value={stats.totalTokens.toLocaleString()}
         />
         {children}
@@ -107,12 +111,15 @@ export const StatsColumn: React.FC<{
 export const DurationColumn: React.FC<{
   apiTime: string;
   wallTime: string;
-}> = ({ apiTime, wallTime }) => (
-  <Box flexDirection="column" width={'48%'}>
-    <Text bold>Duration</Text>
-    <Box marginTop={1} flexDirection="column">
-      <StatRow label="API Time" value={apiTime} />
-      <StatRow label="Wall Time" value={wallTime} />
+}> = ({ apiTime, wallTime }) => {
+  const { t } = useI18n();
+  return (
+    <Box flexDirection="column" width={'48%'}>
+      <Text bold>{t('stats.duration')}</Text>
+      <Box marginTop={1} flexDirection="column">
+        <StatRow label={t('stats.apiTime')} value={apiTime} />
+        <StatRow label={t('stats.wallTime')} value={wallTime} />
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
