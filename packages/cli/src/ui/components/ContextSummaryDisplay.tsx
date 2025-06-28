@@ -7,7 +7,8 @@
 import React from 'react';
 import { Text } from 'ink';
 import { Colors } from '../colors.js';
-import { type MCPServerConfig } from '@google/gemini-cli-core';
+import { MCPServerConfig } from '@google/gemini-cli-core';
+import { useI18n } from '../hooks/useI18n.js';
 
 interface ContextSummaryDisplayProps {
   geminiMdFileCount: number;
@@ -22,6 +23,7 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
   mcpServers,
   showToolDescriptions,
 }) => {
+  const { t } = useI18n();
   const mcpServerCount = Object.keys(mcpServers || {}).length;
 
   if (geminiMdFileCount === 0 && mcpServerCount === 0) {
@@ -34,31 +36,35 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
     }
     const allNamesTheSame = new Set(contextFileNames).size < 2;
     const name = allNamesTheSame ? contextFileNames[0] : 'context';
-    return `${geminiMdFileCount} ${name} file${
-      geminiMdFileCount > 1 ? 's' : ''
-    }`;
+    return `${geminiMdFileCount} ${name}${t(
+      geminiMdFileCount > 1 ? 'contextSummary.files' : 'contextSummary.file',
+    )}`;
   })();
 
   const mcpText =
     mcpServerCount > 0
-      ? `${mcpServerCount} MCP server${mcpServerCount > 1 ? 's' : ''}`
+      ? `${mcpServerCount}${t(
+          mcpServerCount > 1
+            ? 'contextSummary.mcpServers'
+            : 'contextSummary.mcpServer',
+        )}`
       : '';
 
-  let summaryText = 'Using ';
+  let summaryText = t('contextSummary.using');
   if (geminiMdText) {
     summaryText += geminiMdText;
   }
   if (geminiMdText && mcpText) {
-    summaryText += ' and ';
+    summaryText += t('contextSummary.and');
   }
   if (mcpText) {
     summaryText += mcpText;
     // Add ctrl+t hint when MCP servers are available
     if (mcpServers && Object.keys(mcpServers).length > 0) {
       if (showToolDescriptions) {
-        summaryText += ' (ctrl+t to toggle)';
+        summaryText += t('contextSummary.ctrlTtoggle');
       } else {
-        summaryText += ' (ctrl+t to view)';
+        summaryText += t('contextSummary.ctrlTview');
       }
     }
   }

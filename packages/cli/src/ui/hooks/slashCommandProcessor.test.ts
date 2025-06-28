@@ -724,7 +724,7 @@ describe('useSlashCommandProcessor', () => {
         2,
         expect.objectContaining({
           type: MessageType.ERROR,
-          text: 'Could not retrieve tool registry.',
+          text: 'Could not retrieve tools.',
         }),
         expect.any(Number),
       );
@@ -736,6 +736,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: vi.fn().mockReturnValue([]),
         }),
         getMcpServers: vi.fn().mockReturnValue({}),
@@ -763,6 +764,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: vi.fn().mockReturnValue([]),
         }),
         getMcpServers: vi.fn().mockReturnValue({}),
@@ -826,6 +828,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: mockGetToolsByServer,
         }),
         getMcpServers: vi.fn().mockReturnValue(mockMcpServers),
@@ -899,6 +902,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: vi.fn().mockReturnValue(mockServerTools),
         }),
         getMcpServers: vi.fn().mockReturnValue(mockMcpServers),
@@ -973,6 +977,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: mockGetToolsByServer,
         }),
         getMcpServers: vi.fn().mockReturnValue(mockMcpServers),
@@ -1039,6 +1044,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: mockGetToolsByServer,
         }),
         getMcpServers: vi.fn().mockReturnValue(mockMcpServers),
@@ -1114,6 +1120,7 @@ describe('useSlashCommandProcessor', () => {
       mockConfig = {
         ...mockConfig,
         getToolRegistry: vi.fn().mockResolvedValue({
+          getAllTools: vi.fn().mockReturnValue([]),
           getToolsByServer: vi.fn().mockReturnValue(mockServerTools),
         }),
         getMcpServers: vi.fn().mockReturnValue(mockMcpServers),

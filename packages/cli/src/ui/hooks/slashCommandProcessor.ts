@@ -325,7 +325,16 @@ export const useSlashCommandProcessor = (
           if (!toolRegistry) {
             addMessage({
               type: MessageType.ERROR,
-              content: 'Could not retrieve tool registry.',
+              content: 'Could not retrieve tools.',
+              timestamp: new Date(),
+            });
+            return;
+          }
+          const tools = toolRegistry.getAllTools();
+          if (!tools) {
+            addMessage({
+              type: MessageType.ERROR,
+              content: 'Could not retrieve tools.',
               timestamp: new Date(),
             });
             return;
@@ -547,7 +556,15 @@ export const useSlashCommandProcessor = (
           }
 
           const toolRegistry = await config?.getToolRegistry();
-          const tools = toolRegistry?.getAllTools();
+          if (!toolRegistry) {
+            addMessage({
+              type: MessageType.ERROR,
+              content: 'Could not retrieve tools.',
+              timestamp: new Date(),
+            });
+            return;
+          }
+          const tools = toolRegistry.getAllTools();
           if (!tools) {
             addMessage({
               type: MessageType.ERROR,

@@ -63,7 +63,10 @@ export class WebSearchTool extends BaseTool<
 > {
   static readonly Name: string = 'google_web_search';
 
-  constructor(private readonly config: Config) {
+  constructor(
+    private readonly config: Config,
+    private readonly t: (key: string, ...args: unknown[]) => string,
+  ) {
     super(
       WebSearchTool.Name,
       'GoogleSearch',
@@ -89,16 +92,16 @@ export class WebSearchTool extends BaseTool<
         params,
       )
     ) {
-      return "Parameters failed schema validation. Ensure 'query' is a string.";
+      return this.t('webSearch.invalidParameters');
     }
     if (!params.query || params.query.trim() === '') {
-      return "The 'query' parameter cannot be empty.";
+      return this.t('webSearch.emptyQuery');
     }
     return null;
   }
 
   getDescription(params: WebSearchToolParams): string {
-    return `Searching the web for: "${params.query}"`;
+    return this.t('webSearch.searching', params.query);
   }
 
   async execute(
@@ -108,7 +111,7 @@ export class WebSearchTool extends BaseTool<
     const validationError = this.validateParams(params);
     if (validationError) {
       return {
-        llmContent: `Error: Invalid parameters provided. Reason: ${validationError}`,
+        llmContent: this.t('webSearch.errorInvalidParameters', validationError),
         returnDisplay: validationError,
       };
     }
@@ -132,8 +135,8 @@ export class WebSearchTool extends BaseTool<
 
       if (!responseText || !responseText.trim()) {
         return {
-          llmContent: `No search results or information found for query: "${params.query}"`,
-          returnDisplay: 'No information found.',
+          llmContent: this.t('webSearch.noResults', params.query),
+          returnDisplay: this.t('webSearch.noInformationFound'),
         };
       }
 
@@ -142,9 +145,11 @@ export class WebSearchTool extends BaseTool<
 
       if (sources && sources.length > 0) {
         sources.forEach((source: GroundingChunkItem, index: number) => {
-          const title = source.web?.title || 'Untitled';
-          const uri = source.web?.uri || 'No URI';
-          sourceListFormatted.push(`[${index + 1}] ${title} (${uri})`);
+          const title = source.web?.title || this.t('webSearch.untitled');
+          const uri = source.web?.uri || this.t('webSearch.noUri');
+          sourceListFormatted.push(
+            this.t('webSearch.sourceItem', index + 1, title, uri),
+          );
         });
 
         if (groundingSupports && groundingSupports.length > 0) {
@@ -152,7 +157,9 @@ export class WebSearchTool extends BaseTool<
           groundingSupports.forEach((support: GroundingSupportItem) => {
             if (support.segment && support.groundingChunkIndices) {
               const citationMarker = support.groundingChunkIndices
-                .map((chunkIndex: number) => `[${chunkIndex + 1}]`)
+                .map((chunkIndex: number) =>
+                  this.t('webSearch.citationMarker', chunkIndex + 1),
+                )
                 .join('');
               insertions.push({
                 index: support.segment.endIndex,
@@ -174,21 +181,29 @@ export class WebSearchTool extends BaseTool<
 
         if (sourceListFormatted.length > 0) {
           modifiedResponseText +=
-            '\n\nSources:\n' + sourceListFormatted.join('\n'); // Fixed string concatenation
+            this.t('webSearch.sourcesHeader') + sourceListFormatted.join('\n');
         }
       }
 
       return {
-        llmContent: `Web search results for "${params.query}":\n\n${modifiedResponseText}`,
-        returnDisplay: `Search results for "${params.query}" returned.`,
+        llmContent: this.t(
+          'webSearch.searchResults',
+          params.query,
+          modifiedResponseText,
+        ),
+        returnDisplay: this.t('webSearch.searchResultsReturned', params.query),
         sources,
       };
     } catch (error: unknown) {
-      const errorMessage = `Error during web search for query "${params.query}": ${getErrorMessage(error)}`;
+      const errorMessage = this.t(
+        'webSearch.errorDuringSearch',
+        params.query,
+        getErrorMessage(error),
+      );
       console.error(errorMessage, error);
       return {
-        llmContent: `Error: ${errorMessage}`,
-        returnDisplay: `Error performing web search.`,
+        llmContent: this.t('webSearch.error', errorMessage),
+        returnDisplay: this.t('webSearch.errorPerformingWebSearch'),
       };
     }
   }
