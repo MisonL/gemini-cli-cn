@@ -17,31 +17,32 @@ export class DiscoveredTool extends BaseTool<ToolParams, ToolResult> {
   constructor(
     private readonly config: Config,
     readonly name: string,
+    readonly displayName: string,
     readonly description: string,
     readonly parameterSchema: Record<string, unknown>,
   ) {
     const discoveryCmd = config.getToolDiscoveryCommand()!;
     const callCommand = config.getToolCallCommand()!;
-    description += `
+    const fullDescription = `${description}
 
-This tool was discovered from the project by executing the command \`${discoveryCmd}\` on project root.
-When called, this tool will execute the command \`${callCommand} ${name}\` on project root.
+This tool was discovered from the project by executing the command "${discoveryCmd}" on project root.
+When called, this tool will execute the command "${callCommand} ${name}" on project root.
 Tool discovery and call commands can be configured in project or user settings.
 
 When called, the tool call command is executed as a subprocess.
 On success, tool output is returned as a json string.
 Otherwise, the following information is returned:
 
-Stdout: Output on stdout stream. Can be \`(empty)\` or partial.
-Stderr: Output on stderr stream. Can be \`(empty)\` or partial.
-Error: Error or \`(none)\` if no error was reported for the subprocess.
-Exit Code: Exit code or \`(none)\` if terminated by signal.
-Signal: Signal number or \`(none)\` if no signal was received.
+Stdout: Output on stdout stream. Can be '(empty)' or partial.
+Stderr: Output on stderr stream. Can be '(empty)' or partial.
+Error: Error or '(none)' if no error was reported for the subprocess.
+Exit Code: Exit code or '(none)' if no signal was received.
+Signal: Signal number or '(none)'
 `;
     super(
       name,
-      name,
-      description,
+      displayName,
+      fullDescription,
       parameterSchema,
       false, // isOutputMarkdown
       false, // canUpdateOutput
@@ -126,6 +127,20 @@ export class ToolRegistry {
   private discovery: Promise<void> | null = null;
   private config: Config;
 
+  private toolDisplayNameMap: Record<string, string> = {
+    list_directory: 'ReadFolder',
+    read_file: 'ReadFile',
+    search_file_content: 'SearchText',
+    glob: 'FindFiles',
+    replace: 'Edit',
+    write_file: 'WriteFile',
+    web_fetch: 'WebFetch',
+    read_many_files: 'ReadManyFiles',
+    run_shell_command: 'Shell',
+    save_memory: 'Save Memory',
+    google_web_search: 'GoogleSearch',
+  };
+
   constructor(config: Config) {
     this.config = config;
   }
@@ -177,6 +192,7 @@ export class ToolRegistry {
           new DiscoveredTool(
             this.config,
             func.name!,
+            this.toolDisplayNameMap[func.name!] || func.name!,
             func.description!,
             func.parameters! as Record<string, unknown>,
           ),

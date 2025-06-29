@@ -81,6 +81,7 @@ export const useSlashCommandProcessor = (
 ) => {
   const { t, locale: _locale } = useI18n();
   const session = useSessionStats();
+
   const gitService = useMemo(() => {
     if (!config?.getProjectRoot()) {
       return;
@@ -240,7 +241,7 @@ export const useSlashCommandProcessor = (
           } else {
             addMessage({
               type: MessageType.INFO,
-              content: `Opening documentation in your browser: ${docsUrl}`,
+              content: t('docs.opening', docsUrl),
               timestamp: new Date(),
             });
             await open(docsUrl);
@@ -354,7 +355,7 @@ export const useSlashCommandProcessor = (
             } else {
               addMessage({
                 type: MessageType.INFO,
-                content: `No MCP servers configured. Opening documentation in your browser: ${docsUrl}`,
+                content: t('docs.noMcpServers', docsUrl),
                 timestamp: new Date(),
               });
               await open(docsUrl);
@@ -490,7 +491,7 @@ export const useSlashCommandProcessor = (
                 }
               });
             } else {
-              message += '  No tools available\n';
+              message += `  ${t('tools.noToolsAvailable')}\n`;
             }
             message += '\n';
           }
@@ -521,8 +522,7 @@ export const useSlashCommandProcessor = (
             case undefined:
               addMessage({
                 type: MessageType.ERROR,
-                content:
-                  'Missing command\nUsage: /memory <show|refresh|add> [text for add]',
+                content: t('memory.missingCommand'),
                 timestamp: new Date(),
               });
               return;
@@ -583,7 +583,8 @@ export const useSlashCommandProcessor = (
             geminiTools.forEach((tool) => {
               if (useShowDescriptions && tool.description) {
                 // Format tool name in cyan using simple ANSI cyan color
-                message += `  - \u001b[36m${tool.displayName} (${tool.name})\u001b[0m:\n`;
+                message += `  - \u001b[36m${t('tool.name.' + tool.displayName)} (${tool.name})\u001b[0m:
+`;
 
                 // Apply green color to the description text
                 const greenColor = '\u001b[32m';
@@ -600,7 +601,8 @@ export const useSlashCommandProcessor = (
                 }
               } else {
                 // Use cyan color for the tool name even when not showing descriptions
-                message += `  - \u001b[36m${tool.displayName}\u001b[0m\n`;
+                message += `  - \u001b[36m${t('tool.name.' + tool.displayName)}[0m
+`;
               }
             });
           } else {
@@ -694,7 +696,7 @@ export const useSlashCommandProcessor = (
 
           addMessage({
             type: MessageType.INFO,
-            content: `To submit your bug report, please open the following URL in your browser:\n${bugReportUrl}`,
+            content: t('bug.submitReport', bugReportUrl),
             timestamp: new Date(),
           });
           (async () => {
@@ -1042,29 +1044,29 @@ export const useSlashCommandProcessor = (
     }
     return commands;
   }, [
-    onDebugMessage,
-    setShowHelp,
-    refreshStatic,
-    openThemeDialog,
-    openAuthDialog,
-    openEditorDialog,
-    clearItems,
-    performMemoryRefresh,
-    showMemoryAction,
-    addMemoryAction,
-    addMessage,
-    toggleCorgiMode,
-    savedChatTags,
+    t,
     config,
+    addMessage,
     showToolDescriptions,
     session,
     gitService,
-    loadHistory,
-    addItem,
-    setQuittingMessages,
     pendingCompressionItemRef,
+    addItem,
+    clearItems,
+    loadHistory,
+    refreshStatic,
+    setShowHelp,
+    onDebugMessage,
+    openThemeDialog,
+    openAuthDialog,
+    openEditorDialog,
+    performMemoryRefresh,
+    toggleCorgiMode,
+    setQuittingMessages,
+    savedChatTags,
+    addMemoryAction,
     setPendingCompressionItem,
-    t,
+    showMemoryAction,
   ]);
 
   const handleSlashCommand = useCallback(

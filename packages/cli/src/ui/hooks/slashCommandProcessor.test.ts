@@ -4,8 +4,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-const { mockProcessExit } = vi.hoisted(() => ({
+const { mockProcessExit, mockUseSessionStats } = vi.hoisted(() => ({
   mockProcessExit: vi.fn((_code?: number): never => undefined as never),
+  mockUseSessionStats: vi.fn(),
+}));
+
+vi.mock('../contexts/SessionContext.js', () => ({
+  useSessionStats: mockUseSessionStats,
+}));
+
+const t = vi.fn((key: string, ...args: Array<string | number>) => {
+  switch (key) {
+    case 'tools.noToolsAvailable':
+      return '没有可用的工具';
+    default:
+      return `${key}${args.length > 0 ? ': ' + args.join(', ') : ''}`;
+  }
+});
+
+vi.mock('./useI18n.js', () => ({
+  useI18n: vi.fn(() => ({
+    t,
+    locale: 'zh-CN', // Set locale to zh-CN for testing
+  })),
 }));
 
 vi.mock('node:process', () => ({
@@ -42,6 +63,10 @@ vi.mock('node:process', () => ({
   })),
 }));
 
+vi.mock('../contexts/SessionContext.js', () => ({
+  useSessionStats: vi.fn(),
+}));
+
 vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(),
   writeFile: vi.fn(),
@@ -60,6 +85,7 @@ import {
   useSlashCommandProcessor,
   type SlashCommandActionReturn,
 } from './slashCommandProcessor.js';
+
 import { MessageType } from '../types.js';
 import {
   Config,
@@ -73,10 +99,6 @@ import { useSessionStats } from '../contexts/SessionContext.js';
 import { LoadedSettings } from '../../config/settings.js';
 import * as ShowMemoryCommandModule from './useShowMemoryCommand.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
-
-vi.mock('../contexts/SessionContext.js', () => ({
-  useSessionStats: vi.fn(),
-}));
 
 vi.mock('./useShowMemoryCommand.js', () => ({
   SHOW_MEMORY_COMMAND_NAME: '/memory show',
@@ -620,8 +642,8 @@ describe('useSlashCommandProcessor', () => {
 
       // Should only show tool1 and tool2, not the MCP tools
       const message = mockAddItem.mock.calls[1][0].text;
-      expect(message).toContain('Tool1');
-      expect(message).toContain('Tool2');
+      expect(message).toContain(`tool.name.${mockTools[0].displayName}`);
+      expect(message).toContain(`tool.name.${mockTools[1].displayName}`);
       expect(commandResult).toBe(true);
     });
 
@@ -646,7 +668,7 @@ describe('useSlashCommandProcessor', () => {
       });
 
       const message = mockAddItem.mock.calls[1][0].text;
-      expect(message).toContain('No tools available');
+      expect(message).toContain('没有可用的工具');
       expect(commandResult).toBe(true);
     });
 
@@ -780,7 +802,7 @@ describe('useSlashCommandProcessor', () => {
         2,
         expect.objectContaining({
           type: MessageType.INFO,
-          text: 'No MCP servers configured. Opening documentation in your browser: https://goo.gle/gemini-cli-docs-mcp',
+          text: t('docs.noMcpServers', 'https://goo.gle/gemini-cli-docs-mcp'),
         }),
         expect.any(Number),
       );
@@ -1007,7 +1029,7 @@ describe('useSlashCommandProcessor', () => {
       expect(message).toContain(
         '🔴 \u001b[1mserver2\u001b[0m - Disconnected (0 tools cached)',
       );
-      expect(message).toContain('No tools available');
+      expect(message).toContain('没有可用的工具');
 
       expect(commandResult).toBe(true);
     });

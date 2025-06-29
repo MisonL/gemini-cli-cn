@@ -9,6 +9,7 @@ import { themeManager } from '../themes/theme-manager.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js'; // Import LoadedSettings, AppSettings, MergedSetting
 import { type HistoryItem, MessageType } from '../types.js';
 import process from 'node:process';
+import { useI18n } from './useI18n.js';
 
 interface UseThemeCommandReturn {
   isThemeDialogOpen: boolean;
@@ -25,6 +26,7 @@ export const useThemeCommand = (
   setThemeError: (error: string | null) => void,
   addItem: (item: Omit<HistoryItem, 'id'>, timestamp: number) => void,
 ): UseThemeCommandReturn => {
+  const { t } = useI18n();
   // Determine the effective theme
   const effectiveTheme = loadedSettings.merged.theme;
 
@@ -42,7 +44,7 @@ export const useThemeCommand = (
         addItem(
           {
             type: MessageType.INFO,
-            text: 'Theme configuration unavailable due to NO_COLOR env variable.',
+            text: t('themeDialog.noColorEnvVar'),
           },
           Date.now(),
         );
@@ -57,7 +59,7 @@ export const useThemeCommand = (
     } else {
       setThemeError(null);
     }
-  }, [effectiveTheme, setThemeError, addItem]); // Re-run if effectiveTheme or setThemeError changes
+  }, [effectiveTheme, setThemeError, addItem, t]); // Re-run if effectiveTheme or setThemeError changes
 
   const openThemeDialog = useCallback(() => {
     if (process.env.NO_COLOR) {

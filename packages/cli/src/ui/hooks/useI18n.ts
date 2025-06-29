@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  t,
+  t as i18n_t,
   getCurrentLocale,
   onLocaleChange,
   offLocaleChange,
@@ -26,6 +26,8 @@ export function useI18n() {
       offLocaleChange(handleLocaleChange);
     };
   }, []);
+
+  const t = useMemo(() => i18n_t, []);
 
   return { t, locale };
 }

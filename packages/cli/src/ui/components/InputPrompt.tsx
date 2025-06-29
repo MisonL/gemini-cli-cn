@@ -33,6 +33,7 @@ export interface InputPromptProps {
   suggestionsWidth: number;
   shellModeActive: boolean;
   setShellModeActive: (value: boolean) => void;
+  t: (key: string, ...args: unknown[]) => string;
 }
 
 export const InputPrompt: React.FC<InputPromptProps> = ({

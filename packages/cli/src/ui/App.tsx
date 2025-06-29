@@ -794,6 +794,7 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
                   slashCommands={slashCommands}
                   shellModeActive={shellModeActive}
                   setShellModeActive={setShellModeActive}
+                  t={t}
                 />
               )}
             </>

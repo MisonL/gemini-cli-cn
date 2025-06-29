@@ -32,32 +32,13 @@ export const Help: React.FC<Help> = ({ commands }) => {
         <Text bold color={Colors.AccentPurple}>
           {t('help.addContext')}
         </Text>
-        {t(
-          'help.addContextDescription',
-          <Text bold color={Colors.AccentPurple}>
-            @
-          </Text>,
-          <Text bold color={Colors.AccentPurple}>
-            @src/myFile.ts
-          </Text>,
-        )}
+        {t('help.addContextDescription', '@', '@src/myFile.ts')}
       </Text>
       <Text color={Colors.Foreground}>
         <Text bold color={Colors.AccentPurple}>
           {t('help.shellMode')}
         </Text>
-        {t(
-          'help.shellModeDescription',
-          <Text bold color={Colors.AccentPurple}>
-            !
-          </Text>,
-          <Text bold color={Colors.AccentPurple}>
-            !npm run start
-          </Text>,
-          <Text bold color={Colors.AccentPurple}>
-            start server
-          </Text>,
-        )}
+        {t('help.shellModeDescription', '!', '!npm run start', 'start server')}
       </Text>
 
       <Box height={1} />

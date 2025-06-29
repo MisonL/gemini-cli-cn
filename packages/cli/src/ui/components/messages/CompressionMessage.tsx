@@ -9,6 +9,7 @@ import { Box, Text } from 'ink';
 import { CompressionProps } from '../../types.js';
 import Spinner from 'ink-spinner';
 import { Colors } from '../../colors.js';
+import { useI18n } from '../../hooks/useI18n.js';
 
 export interface CompressionDisplayProps {
   compression: CompressionProps;
@@ -21,10 +22,14 @@ export interface CompressionDisplayProps {
 export const CompressionMessage: React.FC<CompressionDisplayProps> = ({
   compression,
 }) => {
+  const { t } = useI18n();
   const text = compression.isPending
-    ? 'Compressing chat history'
-    : `Chat history compressed from ${compression.originalTokenCount ?? 'unknown'}` +
-      ` to ${compression.newTokenCount ?? 'unknown'} tokens.`;
+    ? t('compression.compressing')
+    : t(
+        'compression.compressed',
+        compression.originalTokenCount ?? 'unknown',
+        compression.newTokenCount ?? 'unknown',
+      );
 
   return (
     <Box flexDirection="row">

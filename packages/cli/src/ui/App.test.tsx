@@ -18,6 +18,38 @@ import {
 import { LoadedSettings, SettingsFile, Settings } from '../config/settings.js';
 import process from 'node:process';
 
+const t = vi.fn((key: string, ...args: Array<string | number>) => {
+  switch (key) {
+    case 'contextSummary.file':
+      return ' 个文件';
+    case 'contextSummary.files':
+      return ' 个文件';
+    case 'contextSummary.and':
+      return ' 和 ';
+    case 'contextSummary.mcpServer':
+      return ' 个 MCP 服务器';
+    case 'contextSummary.mcpServers':
+      return ' 个 MCP 服务器';
+    case 'contextSummary.ctrlTview':
+      return ' （按 Ctrl+T 查看）';
+    case 'contextSummary.using':
+      return '正在使用 ';
+    case 'themeDialog.selectTheme':
+      return '选择主题';
+    case 'themeDialog.noColorEnvVar':
+      return '主题配置由于 NO_COLOR 环境变量而不可用。';
+    default:
+      return `${key}${args.length > 0 ? ': ' + args.join(', ') : ''}`;
+  }
+});
+
+vi.mock('./hooks/useI18n.js', () => ({
+  useI18n: vi.fn(() => ({
+    t,
+    locale: 'zh-CN', // Set locale to zh-CN for testing
+  })),
+}));
+
 // Define a more complete mock server config based on actual Config
 interface MockServerConfig {
   apiKey: string;
@@ -241,7 +273,7 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve(); // Wait for any async updates
-    expect(lastFrame()).toContain('Using 1 GEMINI.md file');
+    expect(lastFrame()).toContain(`1 GEMINI.md${t('contextSummary.file')}`);
   });
 
   it('should display default "GEMINI.md" with plural when contextFileName is not set and count is > 1', async () => {
@@ -257,7 +289,7 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('Using 2 GEMINI.md files');
+    expect(lastFrame()).toContain(`2 GEMINI.md${t('contextSummary.files')}`);
   });
 
   it('should display custom contextFileName in footer when set and count is 1', async () => {
@@ -277,7 +309,7 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('Using 1 AGENTS.md file');
+    expect(lastFrame()).toContain(`1 AGENTS.md${t('contextSummary.file')}`);
   });
 
   it('should display a generic message when multiple context files with different names are provided', async () => {
@@ -297,7 +329,7 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('Using 2 context files');
+    expect(lastFrame()).toContain(`2 context${t('contextSummary.files')}`);
   });
 
   it('should display custom contextFileName with plural when set and count is > 1', async () => {
@@ -317,7 +349,7 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('Using 3 MY_NOTES.TXT files');
+    expect(lastFrame()).toContain(`3 MY_NOTES.TXT${t('contextSummary.files')}`);
   });
 
   it('should not display context file message if count is 0, even if contextFileName is set', async () => {
@@ -356,7 +388,9 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('server');
+    expect(lastFrame()).toContain(
+      `2 GEMINI.md${t('contextSummary.files')}${t('contextSummary.and')}1${t('contextSummary.mcpServer')}${t('contextSummary.ctrlTview')}`,
+    );
   });
 
   it('should display only MCP server count when GEMINI.md count is 0', async () => {
@@ -376,7 +410,9 @@ describe('App UI', () => {
     );
     currentUnmount = unmount;
     await Promise.resolve();
-    expect(lastFrame()).toContain('Using 2 MCP servers');
+    expect(lastFrame()).toContain(
+      `2${t('contextSummary.mcpServers')}${t('contextSummary.ctrlTview')}`,
+    );
   });
 
   describe('when no theme is set', () => {
@@ -405,7 +441,7 @@ describe('App UI', () => {
       );
       currentUnmount = unmount;
 
-      expect(lastFrame()).toContain('Select Theme');
+      expect(lastFrame()).toContain(t('themeDialog.selectTheme'));
     });
 
     it('should display a message if NO_COLOR is set', async () => {
@@ -419,9 +455,7 @@ describe('App UI', () => {
       );
       currentUnmount = unmount;
 
-      expect(lastFrame()).toContain(
-        'Theme configuration unavailable due to NO_COLOR env variable.',
-      );
+      expect(lastFrame()).toContain('ℹ ' + t('themeDialog.noColorEnvVar'));
       expect(lastFrame()).not.toContain('Select Theme');
     });
   });

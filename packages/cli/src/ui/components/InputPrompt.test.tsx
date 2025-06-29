@@ -104,6 +104,7 @@ describe('InputPrompt', () => {
       inputWidth: 80,
       suggestionsWidth: 80,
       focus: true,
+      t: vi.fn(),
     };
   });
 
