@@ -198,9 +198,15 @@ export const useSlashCommandProcessor = (
         name: 'locale',
         description: t('command.locale.description'),
         action: (_mainCommand, subCommand, _args) => {
-          // Set locale first so messages are translated
           if (subCommand) {
             setLocale(subCommand);
+            setTimeout(() => {
+              addMessage({
+                type: MessageType.INFO,
+                content: t('command.locale.languageSet', subCommand),
+                timestamp: new Date(),
+              });
+            }, 100);
           }
 
           if (!subCommand) {
@@ -211,11 +217,6 @@ export const useSlashCommandProcessor = (
             });
             return;
           }
-          addMessage({
-            type: MessageType.INFO,
-            content: t('command.locale.languageSet', subCommand),
-            timestamp: new Date(),
-          });
         },
       },
       {

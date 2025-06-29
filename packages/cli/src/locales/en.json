@@ -162,5 +162,16 @@
   "webSearch.searchResultsReturned": "Search results for \"{0}\" returned.",
   "webSearch.errorDuringSearch": "Error during web search for query \"{0}\": {1}",
   "webSearch.error": "Error: {0}",
-  "webSearch.errorPerformingWebSearch": "Error performing web search."
+  "webSearch.errorPerformingWebSearch": "Error performing web search.",
+  "tool.name.ReadFolder": "Read Folder",
+  "tool.name.ReadFile": "Read File",
+  "tool.name.SearchText": "Search Text",
+  "tool.name.FindFiles": "Find Files",
+  "tool.name.Edit": "Edit",
+  "tool.name.WriteFile": "Write File",
+  "tool.name.WebFetch": "Web Fetch",
+  "tool.name.ReadManyFiles": "Read Many Files",
+  "tool.name.Shell": "Shell",
+  "tool.name.Save Memory": "Save Memory",
+  "tool.name.GoogleSearch": "Google Search"
 }
