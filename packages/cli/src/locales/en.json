@@ -82,6 +82,7 @@
   "themeDialog.preview": "Preview",
   "themeDialog.useEnterToSelectTabToChangeFocus": "(Use Enter to select{0})",
   "themeDialog.tabToChangeFocus": ", Tab to change focus",
+  "themeDialog.useEnterToSelect": "Use Enter to select a theme, Esc to cancel.",
   "command.locale.description": "change the display language. Usage: /locale <language_code> (e.g., en, zh-CN)",
   "command.locale.usage": "Usage: /locale <language_code> (e.g., en, zh-CN)",
   "command.locale.languageSet": "Language set to {0}.",

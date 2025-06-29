@@ -1046,6 +1046,7 @@ export const useSlashCommandProcessor = (
     return commands;
   }, [
     t,
+    _locale, // Add _locale to the dependency array
     config,
     addMessage,
     showToolDescriptions,
